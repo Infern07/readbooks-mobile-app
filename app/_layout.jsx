@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { client } from '../lib/appwrite';
 import { UserProvider } from '../contexts/UserContext';
+import { BooksProvider } from '../contexts/BooksContext';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -18,6 +19,7 @@ export default function RootLayout() {
 
   return (
     <UserProvider>  
+    <BooksProvider>
         <StatusBar value="auto" />
         <Stack screenOptions={{ 
           headerStyle: {backgroundColor: theme.background},
@@ -29,6 +31,7 @@ export default function RootLayout() {
           <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        </BooksProvider>
     </UserProvider>
   );
 }
