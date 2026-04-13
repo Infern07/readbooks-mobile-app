@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useCallback, useContext, useState } from 'react'
 const DATABASE_ID = '69dc98610017bb1c515f'
 const COLLECTION_ID = 'books'
 import { useUser } from '../hooks/UseUser'
@@ -7,21 +7,17 @@ import { ID, Permission, Role } from 'react-native-appwrite'
 
 export const BooksContext = createContext()
 
-export function BooksProvider({children}) {
+export function BooksProvider({ children }) {
     const [books, setBooks] = useState([])
     const { user } = useUser()
 
-    async function fetchBooks() {
-        try{
-        }
-        catch (error) {
-            console.error('Error fetching books:', error)
-        }
-    }
+    const fetchBooks = useCallback(async () => {
+        const res = await databases.listDocuments(DATABASE_ID, COLLECTION_ID)
+        setBooks(res.documents)
+    }, [])
 
-    async function createBook(data) {
-        try{
-            // Schema: title, author, description (see Appwrite collection attributes)
+    const createBook = useCallback(
+        async (data) => {
             const payload = {
                 title: data.title,
                 author: data.author,
@@ -38,31 +34,34 @@ export function BooksProvider({children}) {
                     Permission.delete(Role.user(user.$id)),
                 ]
             )
-        }
-        catch (error) {
-            console.error('Error creating book:', error)
-            throw error
-        }
-    }
+        },
+        [user]
+    )
 
-    async function deleteBook(bookId) {
-        try{
+    const updateBook = useCallback(async (bookId, data) => {
+        const payload = {
+            title: data.title,
+            author: data.author,
+            description: data.description ?? '',
         }
-        catch (error) {
-            console.error('Error deleting book:', error)
-        }
-    }
+        const updated = await databases.updateDocument(
+            DATABASE_ID,
+            COLLECTION_ID,
+            bookId,
+            payload
+        )
+        setBooks((prev) => prev.map((b) => (b.$id === bookId ? updated : b)))
+    }, [])
 
-    async function fetchBookById(bookId) {
-        try{
-        }
-        catch (error) {
-            console.error('Error fetching book by id:', error)
-        }
-    }
-    
+    const deleteBook = useCallback(async (bookId) => {
+        await databases.deleteDocument(DATABASE_ID, COLLECTION_ID, bookId)
+        setBooks((prev) => prev.filter((b) => b.$id !== bookId))
+    }, [])
+
     return (
-        <BooksContext.Provider value={{ books, fetchBooks, createBook, deleteBook, fetchBookById }}>
+        <BooksContext.Provider
+            value={{ books, fetchBooks, createBook, updateBook, deleteBook }}
+        >
             {children}
         </BooksContext.Provider>
     )
