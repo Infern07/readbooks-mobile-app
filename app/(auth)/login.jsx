@@ -13,6 +13,7 @@ import ThemedButton from '../../components/ThemedButton'
 import ThemedTextInput from '../../components/ThemedTextInput'
 
 
+
 const login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -49,7 +50,9 @@ const login = () => {
       <ThemedButton onPress={() => {handleSubmit()}}><ThemedText style={{color: 'white'}}>Login</ThemedText></ThemedButton>
       <Spacer height={20} />
       {error && <ThemedText style={{color: 'red', textAlign: 'center'}}>{error}</ThemedText>}
-      <Link href="/register" style={{textAlign:'center', textDecorationLine: 'underline'}}><ThemedText>Register instead?</ThemedText></Link>
+      <Link href="/register" 
+      style={{textAlign:'center', 
+      textDecorationLine: 'underline'}}><ThemedText>Register instead?</ThemedText></Link>
     </ThemedView>
   )
 }
